@@ -37,3 +37,5 @@ resource fwsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = {
 }
 
 output fwSubnetId string = fwsubnet.id
+output vnetId string = hub.id
+output vnetName string = hub.name

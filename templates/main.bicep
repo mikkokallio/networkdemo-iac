@@ -3,7 +3,7 @@
 @description('Provide an Azure region for deploying the resources.')
 param region string = resourceGroup().location
 
-param storageAccountName string = 'toylaunch${uniqueString(resourceGroup().id)}'
+//param storageAccountName string = 'storage${uniqueString(resourceGroup().id)}'
 
 param adminUsername string
 
@@ -20,19 +20,21 @@ module hub 'hub.bicep' = {
 }
 
 module spoke01 'spoke.bicep' = {
-  name: 'vnet-spoke01'
+  name: 'vnet-spoke-01'
   params: {
-    name: 'vnet-spoke01'
+    spokeNumber: '01'
     ipSpace: '2' // 10.0.x.0
+    hubName: hub.outputs.vnetName
     region: region
   }
 }
 
 module spoke02 'spoke.bicep' = {
-  name: 'vnet-spoke02'
+  name: 'vnet-spoke-02'
   params: {
-    name: 'vnet-spoke02'
+    spokeNumber: '02'
     ipSpace: '3' // 10.0.x.0
+    hubName: hub.outputs.vnetName
     region: region
   }
 }
