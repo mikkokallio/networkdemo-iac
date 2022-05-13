@@ -1,15 +1,12 @@
 @minLength(3)
 @maxLength(24)
-@description('Provide a name to use as a suffix in the resources.')
-param projectName string
-
-@minLength(3)
-@maxLength(24)
 @description('Provide an Azure region for deploying the resources.')
 param region string
 
+param adminUsername string
 
-
+@secure()
+param adminPassword string // TODO: Replace with SSH setup
 
 resource hub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: 'vnet-hub'
@@ -136,3 +133,123 @@ resource azureFirewallName_resource 'Microsoft.Network/azureFirewalls@2020-05-01
     }
   }
 }
+
+var subnetRef = '${spoke01.id}/subnets/Subnet-1'
+
+resource nic1 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+  name: 'nic-vm-spoke01-linux'
+  location: region
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          subnet: {
+            id: subnetRef
+          }
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: pipvm01.id
+            properties: {
+              deleteOption: 'Detach'
+            }
+          }
+        }
+      }
+    ]
+    networkSecurityGroup: {
+      id: nsg1.id
+    }
+  }
+}
+
+resource nsg1 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+  name: 'nsg-vm-spoke01'
+  location: region
+  properties: {
+    securityRules: [
+      {
+        name: 'SSH'
+        properties: {
+          'priority': 300
+          'protocol': 'Tcp'
+          'access': 'Allow'
+          'direction': 'Inbound'
+          'sourceAddressPrefix': '*'
+          'sourcePortRange': '*'
+          'destinationAddressPrefix': '*'
+          'destinationPortRange': '22'
+        }
+      }
+    ]
+  }
+}
+
+resource pipvm01 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
+  name: 'pip-vm-spoke01'
+  location: region
+  sku: {
+    name: 'Basic'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Dynamic'
+  }
+}
+
+resource vm01 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+  name: 'vm-spoke01'
+  location: region
+  properties: {
+    hardwareProfile: {
+      vmSize: 'Standard_B1s'
+    }
+    storageProfile: {
+      osDisk: {
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: 'Premium_LRS'
+        }
+        deleteOption: 'Delete'
+      }
+      imageReference: {
+        publisher: 'canonical'
+        offer: '0001-com-ubuntu-server-focal'
+        sku: '20_04-lts-gen2'
+        version: 'latest'
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: nic1.id
+          properties: {
+            deleteOption: 'Detach'
+          }
+        }
+      ]
+    }
+    osProfile: {
+      computerName: 'vm-spoke01'
+      adminUsername: adminUsername
+      adminPassword: adminPassword
+//      linuxConfiguration: {
+//        disablePasswordAuthentication: true
+//        ssh: {
+//          publicKeys: [
+//            {
+//              path: '/home/${adminUsername}/.ssh/authorized_keys'
+//              keyData: adminPublicKey
+//            }
+//          ]
+//        }
+//      }
+    }
+    diagnosticsProfile: {
+      bootDiagnostics: {
+        enabled: true
+      }
+    }
+  }
+}
+
+output adminUsername string = adminUsername
