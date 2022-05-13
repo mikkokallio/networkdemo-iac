@@ -45,122 +45,24 @@ module firewall 'firewall.bicep' = if (deployFirewall) {
   }
 }
 
-var subnetRef = '${spoke01.outputs.id}/subnets/subnet-01'
-
-resource nic1 'Microsoft.Network/networkInterfaces@2021-03-01' = {
-  name: 'nic-vm-spoke01-linux'
-  location: region
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          subnet: {
-            id: subnetRef
-          }
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: pipvm01.id
-            properties: {
-              deleteOption: 'Detach'
-            }
-          }
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: nsg1.id
-    }
+module vm01 'vm.bicep' = {
+  name: 'vm-01'
+  params: {
+    ordinal: '01'
+    region: region
+    adminPassword: adminPassword
+    adminUsername: adminUsername
+    subnetId: '${spoke01.outputs.id}/subnets/subnet-01'
   }
 }
 
-resource nsg1 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
-  name: 'nsg-vm-spoke01'
-  location: region
-  properties: {
-    securityRules: [
-      {
-        name: 'SSH'
-        properties: {
-          'priority': 300
-          'protocol': 'Tcp'
-          'access': 'Allow'
-          'direction': 'Inbound'
-          'sourceAddressPrefix': '*'
-          'sourcePortRange': '*'
-          'destinationAddressPrefix': '*'
-          'destinationPortRange': '22'
-        }
-      }
-    ]
+module vm02 'vm.bicep' = {
+  name: 'vm-02'
+  params: {
+    ordinal: '02'
+    region: region
+    adminPassword: adminPassword
+    adminUsername: adminUsername
+    subnetId: '${spoke02.outputs.id}/subnets/subnet-01'
   }
 }
-
-resource pipvm01 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
-  name: 'pip-vm-spoke01'
-  location: region
-  sku: {
-    name: 'Basic'
-  }
-  properties: {
-    publicIPAllocationMethod: 'Dynamic'
-  }
-}
-
-resource vm01 'Microsoft.Compute/virtualMachines@2021-07-01' = {
-  name: 'vm-spoke01'
-  location: region
-  properties: {
-    hardwareProfile: {
-      vmSize: 'Standard_B1s'
-    }
-    storageProfile: {
-      osDisk: {
-        createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: 'Premium_LRS'
-        }
-        deleteOption: 'Delete'
-      }
-      imageReference: {
-        publisher: 'canonical'
-        offer: '0001-com-ubuntu-server-focal'
-        sku: '20_04-lts-gen2'
-        version: 'latest'
-      }
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: nic1.id
-          properties: {
-            deleteOption: 'Detach'
-          }
-        }
-      ]
-    }
-    osProfile: {
-      computerName: 'vm-spoke01'
-      adminUsername: adminUsername
-      adminPassword: adminPassword
-//      linuxConfiguration: {
-//        disablePasswordAuthentication: true
-//        ssh: {
-//          publicKeys: [
-//            {
-//              path: '/home/${adminUsername}/.ssh/authorized_keys'
-//              keyData: adminPublicKey
-//            }
-//          ]
-//        }
-//      }
-    }
-    diagnosticsProfile: {
-      bootDiagnostics: {
-        enabled: true
-      }
-    }
-  }
-}
-
-output adminUsername string = adminUsername
