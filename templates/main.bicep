@@ -1,140 +1,51 @@
 @minLength(3)
 @maxLength(24)
 @description('Provide an Azure region for deploying the resources.')
-param region string
+param region string = resourceGroup().location
+
+param storageAccountName string = 'toylaunch${uniqueString(resourceGroup().id)}'
 
 param adminUsername string
+
+param deployFirewall bool = false
 
 @secure()
 param adminPassword string // TODO: Replace with SSH setup
 
-resource hub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
+module hub 'hub.bicep' = {
   name: 'vnet-hub'
-  location: region
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/22'
-      ]
-    }
-    subnets: [
-      {
-        name: 'GatewaySubnet'
-        properties: {
-          addressPrefix: '10.0.0.0/26'
-        }
-      }
-      {
-        name: 'BastionSubnet'
-        properties: {
-          addressPrefix: '10.0.0.64/26'
-        }
-      }
-    ]
+  params: {
+    region: region
   }
 }
 
-resource fwsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = {
-  parent: hub
-  name: 'AzureFirewallSubnet'
-  properties: {
-    addressPrefix: '10.0.0.128/26'
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
-  }
-}
-
-resource spoke01 'Microsoft.Network/virtualNetworks@2019-11-01' = {
+module spoke01 'spoke.bicep' = {
   name: 'vnet-spoke01'
-  location: region
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.2.0/24'
-      ]
-    }
-    subnets: [
-      {
-        name: 'Subnet-1'
-        properties: {
-          addressPrefix: '10.0.2.0/25'
-        }
-      }
-      {
-        name: 'Subnet-2'
-        properties: {
-          addressPrefix: '10.0.2.128/25'
-        }
-      }
-    ]
+  params: {
+    name: 'vnet-spoke01'
+    ipSpace: '2' // 10.0.x.0
+    region: region
   }
 }
 
-resource spoke02 'Microsoft.Network/virtualNetworks@2019-11-01' = {
+module spoke02 'spoke.bicep' = {
   name: 'vnet-spoke02'
-  location: region
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.3.0/24'
-      ]
-    }
-    subnets: [
-      {
-        name: 'Subnet-1'
-        properties: {
-          addressPrefix: '10.0.3.0/25'
-        }
-      }
-      {
-        name: 'Subnet-2'
-        properties: {
-          addressPrefix: '10.0.3.128/25'
-        }
-      }
-    ]
+  params: {
+    name: 'vnet-spoke02'
+    ipSpace: '3' // 10.0.x.0
+    region: region
   }
 }
 
-resource pipfw 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
-  name: 'pip-firewall'
-  location: region
-  tags: {}
-  sku: {
-    name: 'Standard'
-  }
-  zones: []
-  properties: {
-    publicIPAllocationMethod: 'Static'
+module firewall 'firewall.bicep' = if (deployFirewall) {
+  name: 'fw-hub'
+  params: {
+    region: region
+    subnetId: hub.outputs.fwSubnetId
   }
 }
 
-resource azureFirewallName_resource 'Microsoft.Network/azureFirewalls@2020-05-01' = {
-  name: 'azfw-hub'
-  location: region
-  tags: {}
-  zones: []
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig-fw'
-        properties: {
-          subnet: {
-            id: fwsubnet.id
-          }
-          publicIPAddress: {
-            id: pipfw.id
-          }
-        }
-      }
-    ]
-    sku: {
-      tier: 'Standard'
-    }
-  }
-}
-
-var subnetRef = '${spoke01.id}/subnets/Subnet-1'
+var subnetRef = '${spoke01.outputs.id}/subnets/subnet-01'
 
 resource nic1 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: 'nic-vm-spoke01-linux'
