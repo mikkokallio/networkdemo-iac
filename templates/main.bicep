@@ -33,13 +33,17 @@ resource hub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
           addressPrefix: '10.0.0.64/26'
         }
       }
-      {
-        name: 'AzureFirewallSubnet'
-        properties: {
-          addressPrefix: '10.0.0.128/26'
-        }
-      }
     ]
+  }
+}
+
+resource fwsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = {
+  parent: hub
+  name: 'AzureFirewallSubnet'
+  properties: {
+    addressPrefix: '10.0.0.128/26'
+    privateEndpointNetworkPolicies: 'Enabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
   }
 }
 
@@ -92,5 +96,43 @@ resource spoke02 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         }
       }
     ]
+  }
+}
+
+resource pipfw 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
+  name: 'pip-firewall'
+  location: region
+  tags: {}
+  sku: {
+    name: 'Standard'
+  }
+  zones: []
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+}
+
+resource azureFirewallName_resource 'Microsoft.Network/azureFirewalls@2020-05-01' = {
+  name: 'azfw-hub'
+  location: region
+  tags: {}
+  zones: []
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig-fw'
+        properties: {
+          subnet: {
+            id: fwsubnet.id
+          }
+          publicIPAddress: {
+            id: pipfw.id
+          }
+        }
+      }
+    ]
+    sku: {
+      tier: 'Standard'
+    }
   }
 }
