@@ -7,4 +7,11 @@
 
 ## Incorporating deployment json to bicep
 
-az bicep decompile --file .\template.json 
+az bicep decompile --file .\template.json
+
+## Todo
+
+* VPN gateway
+* Bastion
+* UDRs
+* Network watcher agents

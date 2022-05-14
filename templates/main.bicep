@@ -7,7 +7,8 @@ param region string = resourceGroup().location
 
 param adminUsername string
 
-param deployFirewall bool = false
+param deployFirewall bool = true
+param deployBastion bool = true
 
 @secure()
 param adminPassword string // TODO: Replace with SSH setup
@@ -39,6 +40,14 @@ module spoke02 'spoke.bicep' = {
   }
 }
 
+module bastion 'bastion.bicep' = if (deployBastion) {
+  name: 'bastion-hub'
+  params: {
+    region: region
+    hub: hub.outputs.vnetId
+  }
+}
+
 module firewall 'firewall.bicep' = if (deployFirewall) {
   name: 'fw-hub'
   params: {
@@ -46,6 +55,7 @@ module firewall 'firewall.bicep' = if (deployFirewall) {
     subnetId: hub.outputs.fwSubnetId
   }
 }
+
 
 module vm01 'vm.bicep' = {
   name: 'vm-01'

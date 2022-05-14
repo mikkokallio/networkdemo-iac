@@ -4,11 +4,9 @@ param subnetId string
 resource pipfw 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
   name: 'pip-firewall'
   location: region
-  tags: {}
   sku: {
     name: 'Standard'
   }
-  zones: []
   properties: {
     publicIPAllocationMethod: 'Static'
   }
