@@ -1,7 +1,7 @@
 param region string
-param subnetId string
+param hub string
 
-resource pipfw 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
+resource pip 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
   name: 'pip-firewall'
   location: region
   sku: {
@@ -12,21 +12,19 @@ resource pipfw 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
   }
 }
 
-resource azureFirewallName_resource 'Microsoft.Network/azureFirewalls@2020-05-01' = {
-  name: 'azfw-hub'
+resource firewall 'Microsoft.Network/azureFirewalls@2020-05-01' = {
+  name: 'firewall-hub'
   location: region
-  tags: {}
-  zones: []
   properties: {
     ipConfigurations: [
       {
-        name: 'ipconfig-fw'
+        name: 'ipconfig'
         properties: {
           subnet: {
-            id: subnetId
+            id: '${hub}/subnets/AzureFirewallSubnet'
           }
           publicIPAddress: {
-            id: pipfw.id
+            id: pip.id
           }
         }
       }

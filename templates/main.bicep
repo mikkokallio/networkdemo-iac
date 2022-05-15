@@ -1,18 +1,25 @@
 @minLength(3)
 @maxLength(24)
-@description('Provide an Azure region for deploying the resources.')
+@description('Choose an Azure region for deploying the resources.')
 param region string = resourceGroup().location
 
 //param storageAccountName string = 'storage${uniqueString(resourceGroup().id)}'
 
-param adminUsername string
-
+@description('Choose whether an Azure Firewall is deployed in the hub vnet.')
 param deployFirewall bool = true
+@description('Choose whether an Azure Bastion is deployed in the hub vnet.')
 param deployBastion bool = true
-
+@minValue(1)
+@maxValue(4)
+@description('Choose how many spoke vnets (with a VM each) are deployed.')
+param numberOfSpokes int = 3
+@description('Choose an admin username for accessing the spoke VMs.')
+param adminUsername string
+@description('Choose an admin password for accessing the spoke VMs.')
 @secure()
 param adminPassword string // TODO: Replace with SSH setup
 
+/* Deploy a central hub vnet for connectivity resources */
 module hub 'hub.bicep' = {
   name: 'vnet-hub'
   params: {
@@ -20,26 +27,20 @@ module hub 'hub.bicep' = {
   }
 }
 
-module spoke01 'spoke.bicep' = {
-  name: 'vnet-spoke-01'
+/* Deploy spoke vnets, each peered to the hub and with a VM */
+module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
+  name: 'vnet-spoke-0${i}'
   params: {
-    spokeNumber: '01'
-    ipSpace: '2' // 10.0.x.0
+    spokeNumber: '0${i}'
+    ipSpace: '${i + 1}' // 10.0.x.0
     hubName: hub.outputs.vnetName
     region: region
+    adminPassword: adminPassword
+    adminUsername: adminUsername
   }
-}
+}]
 
-module spoke02 'spoke.bicep' = {
-  name: 'vnet-spoke-02'
-  params: {
-    spokeNumber: '02'
-    ipSpace: '3' // 10.0.x.0
-    hubName: hub.outputs.vnetName
-    region: region
-  }
-}
-
+/* Deploy a bastion host in the hub for accessing spoke VMs */
 module bastion 'bastion.bicep' = if (deployBastion) {
   name: 'bastion-hub'
   params: {
@@ -48,33 +49,11 @@ module bastion 'bastion.bicep' = if (deployBastion) {
   }
 }
 
+/* Deploy a firewall in the hub */
 module firewall 'firewall.bicep' = if (deployFirewall) {
-  name: 'fw-hub'
+  name: 'firewall-hub'
   params: {
     region: region
-    subnetId: hub.outputs.fwSubnetId
-  }
-}
-
-
-module vm01 'vm.bicep' = {
-  name: 'vm-01'
-  params: {
-    ordinal: '01'
-    region: region
-    adminPassword: adminPassword
-    adminUsername: adminUsername
-    subnetId: '${spoke01.outputs.id}/subnets/subnet-01'
-  }
-}
-
-module vm02 'vm.bicep' = {
-  name: 'vm-02'
-  params: {
-    ordinal: '02'
-    region: region
-    adminPassword: adminPassword
-    adminUsername: adminUsername
-    subnetId: '${spoke02.outputs.id}/subnets/subnet-01'
+    hub: hub.outputs.vnetId
   }
 }

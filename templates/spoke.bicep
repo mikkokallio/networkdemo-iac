@@ -2,6 +2,9 @@ param spokeNumber string
 param ipSpace string
 param region string
 param hubName string
+param adminUsername string
+param adminPassword string
+
 
 resource spoke 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: 'vnet-spoke-${spokeNumber}'
@@ -61,4 +64,13 @@ resource linkFromSpoke 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings
   }
 }
 
-output id string = spoke.id
+module vm 'vm.bicep' = {
+  name: 'vm-${spokeNumber}'
+  params: {
+    vmNumber: spokeNumber
+    region: region
+    adminPassword: adminPassword
+    adminUsername: adminUsername
+    subnetId: '${spoke.id}/subnets/subnet-01'
+  }
+}

@@ -1,11 +1,11 @@
 param region string
-param ordinal string
+param vmNumber string
 param adminUsername string
 param adminPassword string
 param subnetId string
 
 resource nic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
-  name: 'nic-vm-spoke-${ordinal}'
+  name: 'nic-vm-spoke-${vmNumber}'
   location: region
   properties: {
     ipConfigurations: [
@@ -32,7 +32,7 @@ resource nic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 }
 
 resource nsg 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
-  name: 'nsg-vm-spoke-${ordinal}'
+  name: 'nsg-vm-spoke-${vmNumber}'
   location: region
   properties: {
     securityRules: [
@@ -54,7 +54,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
 }
 
 resource pip 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
-  name: 'pip-vm-spoke-${ordinal}'
+  name: 'pip-vm-spoke-${vmNumber}'
   location: region
   sku: {
     name: 'Basic'
@@ -65,7 +65,7 @@ resource pip 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
 }
 
 resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
-  name: 'vm-spoke-${ordinal}'
+  name: 'vm-spoke-${vmNumber}'
   location: region
   properties: {
     hardwareProfile: {
@@ -97,7 +97,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       ]
     }
     osProfile: {
-      computerName: 'vm-spoke-${ordinal}'
+      computerName: 'vm-spoke-${vmNumber}'
       adminUsername: adminUsername
       adminPassword: adminPassword
 //      linuxConfiguration: {
