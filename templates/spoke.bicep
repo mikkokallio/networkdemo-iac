@@ -5,6 +5,7 @@ param hubName string
 param dnsZone string
 param adminUsername string
 param adminPassword string
+param routetableId string
 
 
 resource spoke 'Microsoft.Network/virtualNetworks@2019-11-01' = {
@@ -21,6 +22,9 @@ resource spoke 'Microsoft.Network/virtualNetworks@2019-11-01' = {
         name: 'subnet-01'
         properties: {
           addressPrefix: '10.0.${ipSpace}.0/25'
+          routeTable: {
+            id: routetableId
+          }
         }
       }
       {

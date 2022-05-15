@@ -41,6 +41,7 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
     dnsZone: dnsZone
     adminPassword: adminPassword
     adminUsername: adminUsername
+    routetableId: routes.outputs.id
   }
 }]
 
@@ -73,6 +74,6 @@ module routes 'routes.bicep' = {
   name: 'routetable'
   params: {
     region: region
-    ip: firewall.outputs.ip
+    //ip: firewall.outputs.ip
   }
 }

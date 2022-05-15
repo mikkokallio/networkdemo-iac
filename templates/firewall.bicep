@@ -47,10 +47,10 @@ resource firewall 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 'TCP'
               ]
               sourceAddresses: [
-                '10.0.0.0/16'
+                '10.0.0.0/8'
               ]
               destinationAddresses: [
-                '10.0.0.0/16'
+                '10.0.0.0/8'
               ]
               destinationPorts: [
                 '22'
@@ -62,10 +62,10 @@ resource firewall 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 'ICMP'
               ]
               sourceAddresses: [
-                '10.0.0.0/16'
+                '10.0.0.0/8'
               ]
               destinationAddresses: [
-                '10.0.0.0/16'
+                '10.0.0.0/8'
               ]
               destinationPorts: [
                 '*'
@@ -78,4 +78,4 @@ resource firewall 'Microsoft.Network/azureFirewalls@2020-05-01' = {
   }
 }
 
-output ip string = pip.properties.ipAddress
+//output ip string = firewall.properties.hubIPAddresses.privateIPAddress // Only in vwan hub?
