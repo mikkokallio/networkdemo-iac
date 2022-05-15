@@ -42,7 +42,7 @@ resource linkToSpoke 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2
   name: 'link-spoke-hub-${spokeNumber}'
   properties: {
     allowVirtualNetworkAccess: true
-    allowForwardedTraffic: false
+    allowForwardedTraffic: true
     allowGatewayTransit: false
     useRemoteGateways: false
     remoteVirtualNetwork: {
@@ -56,7 +56,7 @@ resource linkFromSpoke 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings
   name: 'link-spoke-hub-${spokeNumber}'
   properties: {
     allowVirtualNetworkAccess: true
-    allowForwardedTraffic: false
+    allowForwardedTraffic: true
     allowGatewayTransit: false
     useRemoteGateways: false
     remoteVirtualNetwork: {

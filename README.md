@@ -12,6 +12,4 @@ az bicep decompile --file .\template.json
 ## Todo
 
 * VPN gateway
-* Bastion
 * UDRs
-* Network watcher agents
