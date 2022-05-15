@@ -13,6 +13,8 @@ param deployBastion bool = true
 @maxValue(4)
 @description('Choose how many spoke vnets (with a VM each) are deployed.')
 param numberOfSpokes int = 3
+@description('Choose a name for you private DNS zone.')
+param dnsZone string = 'networkdemo.com'
 @description('Choose an admin username for accessing the spoke VMs.')
 param adminUsername string
 @description('Choose an admin password for accessing the spoke VMs.')
@@ -24,6 +26,7 @@ module hub 'hub.bicep' = {
   name: 'vnet-hub'
   params: {
     region: region
+    dnsZone: dnsZone
   }
 }
 
@@ -35,6 +38,7 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
     ipSpace: '${i + 1}' // 10.0.x.0
     hubName: hub.outputs.vnetName
     region: region
+    dnsZone: dnsZone
     adminPassword: adminPassword
     adminUsername: adminUsername
   }
@@ -56,4 +60,10 @@ module firewall 'firewall.bicep' = if (deployFirewall) {
     region: region
     hub: hub.outputs.vnetId
   }
+}
+
+/* Deploy a private DNS zone to resolve e.g. VM names */
+resource dnszone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+  name: dnsZone
+  location: 'global'
 }

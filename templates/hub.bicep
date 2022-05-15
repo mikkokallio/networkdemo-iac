@@ -1,4 +1,5 @@
 param region string
+param dnsZone string
 
 resource hub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: 'vnet-hub'
@@ -36,9 +37,15 @@ resource fwsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = {
   }
 }
 
-output fwSubnetId string = fwsubnet.id
+module dnslink 'dnslink.bicep' = {
+  name: 'dnslink-hub'
+  params: {
+    name: dnsZone
+    vnetId: hub.id
+    vnetName: hub.name
+  }
+}
+
 output vnetId string = hub.id
 output vnetName string = hub.name
-//output bastionSubnetId string = bastionsubnet.id
 output bastionSubnetName string = '${hub.name}/subnets/AzureBastionSubnet'
-//output subi object = hub.subnets.
