@@ -67,3 +67,12 @@ resource dnszone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
   name: dnsZone
   location: 'global'
 }
+
+/* Deploy a route table to enable spoke-spoke traffic */
+module routes 'routes.bicep' = {
+  name: 'routetable'
+  params: {
+    region: region
+    ip: firewall.outputs.ip
+  }
+}

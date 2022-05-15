@@ -32,5 +32,50 @@ resource firewall 'Microsoft.Network/azureFirewalls@2020-05-01' = {
     sku: {
       tier: 'Standard'
     }
+    networkRuleCollections: [
+      {
+        name: 'rules'
+        properties: {
+          priority: 2000
+          action: {
+            type: 'Allow'
+          }
+          rules: [
+            {
+              name: 'all'
+              protocols: [
+                'TCP'
+              ]
+              sourceAddresses: [
+                '10.0.0.0/16'
+              ]
+              destinationAddresses: [
+                '10.0.0.0/16'
+              ]
+              destinationPorts: [
+                '22'
+              ]
+            }
+            {
+              name: 'allow_ping'
+              protocols: [
+                'ICMP'
+              ]
+              sourceAddresses: [
+                '10.0.0.0/16'
+              ]
+              destinationAddresses: [
+                '10.0.0.0/16'
+              ]
+              destinationPorts: [
+                '*'
+              ]
+            }
+          ]
+        }
+      }
+    ]
   }
 }
+
+output ip string = pip.properties.ipAddress
