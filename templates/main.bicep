@@ -9,6 +9,8 @@ param region string = resourceGroup().location
 param deployFirewall bool = true
 @description('Choose whether an Azure Bastion is deployed in the hub vnet.')
 param deployBastion bool = true
+//@description('Choose whether a VPN Gateway is deployed in the hub vnet.')
+//param deployGateway bool = true
 @minValue(1)
 @maxValue(4)
 @description('Choose how many spoke vnets (with a VM each) are deployed.')
@@ -17,11 +19,11 @@ param numberOfSpokes int = 3
 param dnsZone string = 'networkdemo.com'
 @description('Choose an admin username for accessing the spoke VMs.')
 param adminUsername string
-@description('Choose an admin password for accessing the spoke VMs.')
 @secure()
+@description('Choose an admin password for accessing the spoke VMs.')
 param adminPassword string // TODO: Replace with SSH setup
 
-/* Deploy a central hub vnet for connectivity resources */
+@description('Deploy a central hub vnet for connectivity resources.')
 module hub 'hub.bicep' = {
   name: 'vnet-hub'
   params: {
@@ -30,7 +32,7 @@ module hub 'hub.bicep' = {
   }
 }
 
-/* Deploy spoke vnets, each peered to the hub and with a VM */
+@description('Deploy spoke vnets, each peered to the hub and with a VM.')
 module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
   name: 'vnet-spoke-0${i}'
   params: {
@@ -45,7 +47,7 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
   }
 }]
 
-/* Deploy a bastion host in the hub for accessing spoke VMs */
+@description('Deploy a bastion host in the hub for accessing spoke VMs.')
 module bastion 'bastion.bicep' = if (deployBastion) {
   name: 'bastion-hub'
   params: {
@@ -54,7 +56,7 @@ module bastion 'bastion.bicep' = if (deployBastion) {
   }
 }
 
-/* Deploy a firewall in the hub */
+@description('Deploy a firewall in the hub.')
 module firewall 'firewall.bicep' = if (deployFirewall) {
   name: 'firewall-hub'
   params: {
@@ -63,13 +65,13 @@ module firewall 'firewall.bicep' = if (deployFirewall) {
   }
 }
 
-/* Deploy a private DNS zone to resolve e.g. VM names */
+@description('Deploy a private DNS zone to resolve e.g. VM names.')
 resource dnszone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
   name: dnsZone
   location: 'global'
 }
 
-/* Deploy a route table to enable spoke-spoke traffic */
+@description('Deploy a route table to enable spoke-spoke traffic.')
 module routes 'routes.bicep' = {
   name: 'routetable'
   params: {

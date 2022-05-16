@@ -35,3 +35,6 @@ The main template deploys the following assets to Azure:
 * Log Analytics for FW
 * Key vault for SSH setup
 * Make VM public IPs optional (no pip by default)
+* Deploy MMA in VMs and enable logging to Log Analytics
+* Add resources with private endpoints and related DNS zones
+* Add simple apps in VMs to generate some traffic
