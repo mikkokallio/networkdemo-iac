@@ -22,6 +22,7 @@ The main template deploys the following assets to Azure:
 ## Bugs
 
 * The deployment fails with the error The zone 'networkdemo.com' does not exist in resource group 'rg-networkdemo' of subscription 'xyz', but running the deployment again solves the issue.
+* Firewall deployment isn't idempotent. Attempting to run the deployment again results in an error.
 
 ## Disclaimers
 
@@ -34,7 +35,6 @@ The main template deploys the following assets to Azure:
 * Storage for network watcher
 * Log Analytics for FW
 * Key vault for SSH setup
-* Make VM public IPs optional (no pip by default)
 * Deploy MMA in VMs and enable logging to Log Analytics
 * Add resources with private endpoints and related DNS zones
 * Add simple apps in VMs to generate some traffic

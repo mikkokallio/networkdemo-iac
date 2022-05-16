@@ -16,12 +16,6 @@ resource nic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: pip.id
-            properties: {
-              deleteOption: 'Detach'
-            }
-          }
         }
       }
     ]
@@ -50,17 +44,6 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
         }
       }
     ]
-  }
-}
-
-resource pip 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
-  name: 'pip-vm-spoke-${vmNumber}'
-  location: region
-  sku: {
-    name: 'Basic'
-  }
-  properties: {
-    publicIPAllocationMethod: 'Dynamic'
   }
 }
 
@@ -100,17 +83,6 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       computerName: 'vm-spoke-${vmNumber}'
       adminUsername: adminUsername
       adminPassword: adminPassword
-//      linuxConfiguration: {
-//        disablePasswordAuthentication: true
-//        ssh: {
-//          publicKeys: [
-//            {
-//              path: '/home/${adminUsername}/.ssh/authorized_keys'
-//              keyData: adminPublicKey
-//            }
-//          ]
-//        }
-//      }
     }
     diagnosticsProfile: {
       bootDiagnostics: {
