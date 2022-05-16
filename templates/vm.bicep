@@ -120,13 +120,27 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   }
 }
 
-resource extension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+resource extensionNW 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
   name: '${vm.name}/AzureNetworkWatcherExtension'
   location: region
   properties: {
-    autoUpgradeMinorVersion: true
     publisher: 'Microsoft.Azure.NetworkWatcher'
     type: 'NetworkWatcherAgentLinux'
     typeHandlerVersion: '1.4'
+    autoUpgradeMinorVersion: true
+    enableAutomaticUpgrade: true
+
+  }
+}
+
+resource extensionAMA 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+  name: '${vm.name}/AzureMonitorLinuxAgent'
+  location: region
+  properties: {
+    publisher: 'Microsoft.Azure.Monitor'
+    type: 'AzureMonitorLinuxAgent'
+    typeHandlerVersion: '1.5'
+    autoUpgradeMinorVersion: true
+    enableAutomaticUpgrade: true
   }
 }

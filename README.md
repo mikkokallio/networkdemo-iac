@@ -15,7 +15,7 @@ The main template deploys the following assets to Azure:
 * A hub vnet with Azure Bastion, Azure Firewall, and VPN Gateway (TBA!)
 * Firewall rules that allow spoke-spoke traffic (ping and ssh).
 * One or more spoke vnets that are peered bi-directionally with the hub.
-* In each spoke vnet, two subnets and a VM with the network watcher extension enabled.
+* In each spoke vnet, two subnets and a VM with the network watcher and AMA extensions enabled.
 * Routes to enable spoke-spoke traffic.
 * A DNS zone that is linked to the hub and all spokes.
 
