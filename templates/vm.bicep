@@ -128,8 +128,6 @@ resource extensionNW 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' =
     type: 'NetworkWatcherAgentLinux'
     typeHandlerVersion: '1.4'
     autoUpgradeMinorVersion: true
-    enableAutomaticUpgrade: true
-
   }
 }
 
