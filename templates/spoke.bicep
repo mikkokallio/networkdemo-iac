@@ -6,6 +6,7 @@ param dnsZone string
 param adminUsername string
 param adminPassword string
 param routetableId string
+param logsId string
 
 
 resource spoke 'Microsoft.Network/virtualNetworks@2019-11-01' = {
@@ -86,5 +87,6 @@ module vm 'vm.bicep' = {
     adminPassword: adminPassword
     adminUsername: adminUsername
     subnetId: '${spoke.id}/subnets/subnet-01'
+    logsId: logsId
   }
 }

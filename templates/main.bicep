@@ -44,6 +44,7 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
     adminPassword: adminPassword
     adminUsername: adminUsername
     routetableId: routes.outputs.id
+    logsId: logs.outputs.id
   }
 }]
 

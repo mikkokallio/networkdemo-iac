@@ -35,7 +35,7 @@ The main template deploys the following assets to Azure:
 * VPN gateway
 * Storage for network watcher
 * Key vault for SSH setup
-* Deploy MMA in VMs and enable logging to Log Analytics
+* VM enable logging to Log Analytics
 * Add resources with private endpoints and related DNS zones
 * Add simple apps in VMs to generate some traffic
 * Use deployment script

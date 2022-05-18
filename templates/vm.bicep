@@ -3,6 +3,7 @@ param vmNumber string
 param adminUsername string
 param adminPassword string
 param subnetId string
+param logsId string
 
 resource nic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: 'nic-vm-spoke-${vmNumber}'
@@ -112,5 +113,49 @@ resource extensionAMA 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' 
     typeHandlerVersion: '1.5'
     autoUpgradeMinorVersion: true
     enableAutomaticUpgrade: true
+  }
+}
+
+resource extensionDA 'Microsoft.Compute/virtualMachines/extensions@2018-10-01' = {
+  name: '${vm.name}/DependencyAgentLinux'
+  location: region
+  properties: {
+    publisher: 'Microsoft.Azure.Monitoring.DependencyAgent'
+    type: 'DependencyAgentLinux'
+    typeHandlerVersion: '9.10'
+    autoUpgradeMinorVersion: true
+  }
+}
+
+resource extensionOMS 'Microsoft.Compute/virtualMachines/extensions@2018-10-01' = {
+  name: '${vm.name}/OMSAgentForLinux'
+  location: region
+  properties: {
+    publisher: 'Microsoft.EnterpriseCloud.Monitoring'
+    type: 'OMSAgentForLinux'
+    typeHandlerVersion: '1.7'
+    autoUpgradeMinorVersion: true
+    settings: {
+      workspaceId: reference(logsId, '2015-03-20').customerId
+      azureResourceId: vm.id
+      stopOnMultipleConnections: true
+    }
+    protectedSettings: {
+      workspaceKey: listKeys(logsId, '2015-03-20').primarySharedKey
+    }
+  }
+}
+
+resource insights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+  location: region
+  name: 'insights-vm-spoke-${vmNumber}'
+  properties: {
+    workspaceResourceId: logsId
+  }
+  plan: {
+    name: 'VMInsights(${split(logsId, '/')[8]})'
+    product: 'OMSGallery/VMInsights'
+    promotionCode: ''
+    publisher: 'Microsoft'
   }
 }
