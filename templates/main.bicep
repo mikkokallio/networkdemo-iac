@@ -62,6 +62,7 @@ module firewall 'firewall.bicep' = if (deployFirewall) {
   params: {
     region: region
     hub: hub.outputs.vnetId
+    logsId: logs.outputs.id
   }
 }
 

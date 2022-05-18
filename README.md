@@ -17,6 +17,7 @@ The main template deploys the following assets to Azure:
 * One or more spoke vnets that are peered bi-directionally with the hub.
 * In each spoke vnet, two subnets and a VM with the network watcher and AMA extensions enabled.
 * Routes to enable spoke-spoke traffic.
+* A Log Analytics workspace for firewall logs.
 * A DNS zone that is linked to the hub and all spokes.
 
 ## Bugs
@@ -33,10 +34,10 @@ The main template deploys the following assets to Azure:
 
 * VPN gateway
 * Storage for network watcher
-* Log Analytics for FW
 * Key vault for SSH setup
 * Deploy MMA in VMs and enable logging to Log Analytics
 * Add resources with private endpoints and related DNS zones
 * Add simple apps in VMs to generate some traffic
 * Use deployment script
+* Firewall workbook
 * Experiment with Azure DNS Private Resolver or Firewall as DNS Proxy

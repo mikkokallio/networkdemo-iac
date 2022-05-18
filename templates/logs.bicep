@@ -9,3 +9,5 @@ resource logs 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
     }
   }
 }
+
+output id string = logs.id

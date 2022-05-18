@@ -1,5 +1,6 @@
 param region string
 param hub string
+param logsId string
 
 resource pip 'Microsoft.Network/publicIpAddresses@2020-08-01' = {
   name: 'pip-firewall'
@@ -78,4 +79,32 @@ resource firewall 'Microsoft.Network/azureFirewalls@2020-05-01' = {
   }
 }
 
-//output ip string = firewall.properties.hubIPAddresses.privateIPAddress // Only in vwan hub?
+resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'diagnostics-firewall'
+  scope: firewall
+  properties: {
+    logAnalyticsDestinationType: 'AzureDiagnostics' // The valid values are Dedicated,AzureDiagnostics
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+        retentionPolicy: {
+          days: 30
+          enabled: true
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+        retentionPolicy: {
+          days: 30
+          enabled: true
+        }
+        /*timeGrain: 'string'*/
+      }
+    ]
+    workspaceId: logsId
+  }
+}
