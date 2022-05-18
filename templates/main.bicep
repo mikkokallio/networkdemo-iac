@@ -79,3 +79,11 @@ module routes 'routes.bicep' = {
     //ip: firewall.outputs.ip
   }
 }
+
+@description('Deploy a Log Analytics workspace to store logs from the firewall and VMs.')
+module logs 'logs.bicep' = {
+  name: 'logs'
+  params: {
+    region: region
+  }
+}

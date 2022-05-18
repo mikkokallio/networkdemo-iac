@@ -38,3 +38,5 @@ The main template deploys the following assets to Azure:
 * Deploy MMA in VMs and enable logging to Log Analytics
 * Add resources with private endpoints and related DNS zones
 * Add simple apps in VMs to generate some traffic
+* Use deployment script
+* Experiment with Azure DNS Private Resolver or Firewall as DNS Proxy
