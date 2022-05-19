@@ -17,13 +17,14 @@ The main template deploys the following assets to Azure:
 * One or more spoke vnets that are peered bi-directionally with the hub.
 * In each spoke vnet, two subnets and a VM with the network watcher and AMA extensions enabled.
 * Routes to enable spoke-spoke traffic.
-* A Log Analytics workspace for firewall logs.
+* A Log Analytics workspace and storage account for firewall logs and other data.
 * A DNS zone that is linked to the hub and all spokes.
 
 ## Bugs
 
 * The deployment fails with the error The zone 'networkdemo.com' does not exist in resource group 'rg-networkdemo' of subscription 'xyz', but running the deployment again solves the issue.
 * Firewall deployment isn't idempotent. Attempting to run the deployment again results in an error.
+* VM insights doesn't work properly.
 
 ## Disclaimers
 
@@ -33,7 +34,6 @@ The main template deploys the following assets to Azure:
 ## Todo
 
 * VPN gateway
-* Storage for network watcher
 * Key vault for SSH setup
 * VM enable logging to Log Analytics
 * Add resources with private endpoints and related DNS zones
@@ -41,3 +41,7 @@ The main template deploys the following assets to Azure:
 * Use deployment script
 * Firewall workbook
 * Experiment with Azure DNS Private Resolver or Firewall as DNS Proxy
+* Block public access to storage
+* NSGs in subnets by default
+* Flow logs enabled for all NSGs
+* Enable tagging

@@ -1,22 +1,24 @@
 param region string
 
+var storageName = 'storagelogs${uniqueString(resourceGroup().id)}'
+
 resource storage 'Microsoft.Storage/storageAccounts@2021-09-01' = {
-  name: 'storage-networkWatcher'
+  name: storageName
   location: region
   sku: {
     name: 'Standard_LRS'
   }
   kind: 'StorageV2'
   properties: {
+    dnsEndpointType: 'Standard'
     defaultToOAuthAuthentication: false
+    publicNetworkAccess: 'Enabled' // TODO: Lock down to private network?
     allowCrossTenantReplication: true
     minimumTlsVersion: 'TLS1_2'
-    allowBlobPublicAccess: false
+    allowBlobPublicAccess: true
     allowSharedKeyAccess: true
     networkAcls: {
       bypass: 'AzureServices'
-      virtualNetworkRules: []
-      ipRules: []
       defaultAction: 'Allow'
     }
     supportsHttpsTrafficOnly: true
@@ -38,7 +40,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2021-09-01' = {
   }
 }
 
-resource storageAccounts_vmimagestorage1_name_default 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01' = {
+resource blob 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01' = {
   parent: storage
   name: 'default'
   properties: {
@@ -57,18 +59,8 @@ resource storageAccounts_vmimagestorage1_name_default 'Microsoft.Storage/storage
       enabled: true
       days: 7
     }
+    isVersioningEnabled: false
   }
 }
 
-resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-09-01' = {
-  parent: storageAccounts_vmimagestorage1_name_default
-  name: 'container-example'
-  properties: {
-    immutableStorageWithVersioning: {
-      enabled: true
-    }
-    defaultEncryptionScope: '$account-encryption-key'
-    denyEncryptionScopeOverride: false
-    publicAccess: 'None'
-  }
-}
+output id string = storage.id

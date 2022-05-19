@@ -2,15 +2,15 @@
 @maxLength(24)
 @description('Choose an Azure region for deploying the resources.')
 param region string = resourceGroup().location
-
-//param storageAccountName string = 'storage${uniqueString(resourceGroup().id)}'
-
 @description('Choose whether an Azure Firewall is deployed in the hub vnet.')
 param deployFirewall bool = true
 @description('Choose whether an Azure Bastion is deployed in the hub vnet.')
 param deployBastion bool = true
 //@description('Choose whether a VPN Gateway is deployed in the hub vnet.')
 //param deployGateway bool = true
+@description('Choose whether to create a Network Wathcer in the region (do this only if one does not exist!).')
+param deployWatcher bool
+
 @minValue(1)
 @maxValue(4)
 @description('Choose how many spoke vnets (with a VM each) are deployed.')
@@ -45,6 +45,7 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
     adminUsername: adminUsername
     routetableId: routes.outputs.id
     logsId: logs.outputs.id
+    storageId: storage.outputs.id
   }
 }]
 
@@ -82,9 +83,23 @@ module routes 'routes.bicep' = {
   }
 }
 
+@description('Deploy a Network Watcher, if needed.')
+resource watcher 'Microsoft.Network/networkWatchers@2021-08-01' = if (deployWatcher) {
+  name: 'NetworkWatcher_${region}'
+  location: region
+}
+
 @description('Deploy a Log Analytics workspace to store logs from the firewall and VMs.')
 module logs 'logs.bicep' = {
   name: 'logs'
+  params: {
+    region: region
+  }
+}
+
+@description('Deploy a storage account to store logs and other data.')
+module storage 'storage.bicep' = {
+  name: 'storage'
   params: {
     region: region
   }

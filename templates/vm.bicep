@@ -4,6 +4,7 @@ param adminUsername string
 param adminPassword string
 param subnetId string
 param logsId string
+param storageId string
 
 resource nic 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: 'nic-vm-spoke-${vmNumber}'
@@ -146,7 +147,7 @@ resource extensionOMS 'Microsoft.Compute/virtualMachines/extensions@2018-10-01' 
   }
 }
 
-resource insights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+/*resource insights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   location: region
   name: 'insights-vm-spoke-${vmNumber}'
   properties: {
@@ -155,7 +156,16 @@ resource insights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' 
   plan: {
     name: 'VMInsights(${split(logsId, '/')[8]})'
     product: 'OMSGallery/VMInsights'
-    promotionCode: ''
     publisher: 'Microsoft'
   }
-}
+}*/
+
+/*module flowlog 'flowlog.bicep' = {
+  name: 'flowlog-${vm.name}'
+  params: {
+    region: region
+    vmName: vm.name
+    storageId: storageId
+    logsId: logsId
+  }
+}*/
