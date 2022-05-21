@@ -8,9 +8,6 @@ param deployFirewall bool = true
 param deployBastion bool = true
 //@description('Choose whether a VPN Gateway is deployed in the hub vnet.')
 //param deployGateway bool = true
-@description('Choose whether to create a Network Wathcer in the region (do this only if one does not exist!).')
-param deployWatcher bool
-
 @minValue(1)
 @maxValue(4)
 @description('Choose how many spoke vnets (with a VM each) are deployed.')
@@ -92,12 +89,6 @@ module routes 'routes.bicep' = {
   params: {
     region: region
   }
-}
-
-@description('Deploy a Network Watcher, if needed.')
-resource watcher 'Microsoft.Network/networkWatchers@2021-08-01' = if (deployWatcher) {
-  name: 'NetworkWatcher_${region}'
-  location: region
 }
 
 @description('Deploy a Log Analytics workspace to store logs from the firewall and VMs.')

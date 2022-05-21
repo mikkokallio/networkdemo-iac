@@ -39,12 +39,11 @@ The main template deploys the following assets to Azure:
 * VPN gateway
 * Key vault for SSH setup
 * VM enable logging to Log Analytics
-* Add resources with private endpoints and related DNS zones
+* Put e.g. private storage endpoint in dedicated subnet in the hub and add DNS zone
 * Add simple apps in VMs to generate some traffic
 * Use deployment script
 * Firewall workbook
 * Experiment with Azure DNS Private Resolver or Firewall as DNS Proxy
 * Block public access to storage
-* NSGs in subnets by default
-* Flow logs enabled for all NSGs
+* NSGs in subnets by default, move flow logs to those
 * Enable tagging

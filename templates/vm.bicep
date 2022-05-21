@@ -160,12 +160,14 @@ resource extensionOMS 'Microsoft.Compute/virtualMachines/extensions@2018-10-01' 
   }
 }*/
 
-/*module flowlog 'flowlog.bicep' = {
+module flowlog 'flowlog.bicep' = {
   name: 'flowlog-${vm.name}'
+  scope: resourceGroup('NetworkWatcherRG')
   params: {
     region: region
+    nsgId: nsg.id
     vmName: vm.name
     storageId: storageId
     logsId: logsId
   }
-}*/
+}
