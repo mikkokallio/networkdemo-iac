@@ -5,6 +5,10 @@
 3. `az configure --defaults group=rg-networkdemo`
 4. `az deployment group create --template-file ./templates/main.bicep`
 
+To avoid entering parameters manually every time you run the template, you can put the values in the command like so:
+
+az deployment group create --template-file ./templates/main.bicep --parameters adminUsername=<username> adminPassword=<password> deployWatcher=false
+
 ## Incorporating deployment json to bicep
 
 az bicep decompile --file .\template.json
@@ -22,7 +26,6 @@ The main template deploys the following assets to Azure:
 
 ## Bugs
 
-* The deployment fails with the error The zone 'networkdemo.com' does not exist in resource group 'rg-networkdemo' of subscription 'xyz', but running the deployment again solves the issue.
 * Firewall deployment isn't idempotent. Attempting to run the deployment again results in an error.
 * VM insights doesn't work properly.
 

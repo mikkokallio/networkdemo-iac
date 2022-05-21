@@ -1,5 +1,4 @@
 param region string
-param dnsZone string
 
 resource hub 'Microsoft.Network/virtualNetworks@2019-11-01' = {
   name: 'vnet-hub'
@@ -34,15 +33,6 @@ resource fwsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = {
     addressPrefix: '10.0.0.128/26'
     privateEndpointNetworkPolicies: 'Enabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
-  }
-}
-
-module dnslink 'dnslink.bicep' = {
-  name: 'dnslink-hub'
-  params: {
-    name: dnsZone
-    vnetId: hub.id
-    vnetName: hub.name
   }
 }
 

@@ -2,7 +2,6 @@ param spokeNumber string
 param ipSpace string
 param region string
 param hubName string
-param dnsZone string
 param adminUsername string
 param adminPassword string
 param routetableId string
@@ -71,15 +70,6 @@ resource linkFromSpoke 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings
   }
 }
 
-module dnslink 'dnslink.bicep' = {
-  name: 'dnslink-${spokeNumber}'
-  params: {
-    name: dnsZone
-    vnetId: spoke.id
-    vnetName: spoke.name
-  }
-}
-
 module vm 'vm.bicep' = {
   name: 'vm-${spokeNumber}'
   params: {
@@ -92,3 +82,5 @@ module vm 'vm.bicep' = {
     storageId: storageId
   }
 }
+
+output id string = spoke.id

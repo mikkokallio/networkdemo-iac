@@ -28,7 +28,6 @@ module hub 'hub.bicep' = {
   name: 'vnet-hub'
   params: {
     region: region
-    dnsZone: dnsZone
   }
 }
 
@@ -40,7 +39,6 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
     ipSpace: '${i + 1}' // 10.0.x.0
     hubName: hub.outputs.vnetName
     region: region
-    dnsZone: dnsZone
     adminPassword: adminPassword
     adminUsername: adminUsername
     routetableId: routes.outputs.id
@@ -68,10 +66,14 @@ module firewall 'firewall.bicep' = if (deployFirewall) {
   }
 }
 
-@description('Deploy a private DNS zone to resolve e.g. VM names.')
-resource dnszone 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+@description('Deploy a private DNS zone and link vnets to it.')
+module dns 'dns.bicep' = {
   name: dnsZone
-  location: 'global'
+  params: {
+    dnsZone: dnsZone
+    hubId: hub.outputs.vnetId
+    spokeIds: [for i in range(0, numberOfSpokes): spoke[i].outputs.id]
+  }
 }
 
 @description('Deploy a route table to enable spoke-spoke traffic.')
@@ -79,7 +81,6 @@ module routes 'routes.bicep' = {
   name: 'routetable'
   params: {
     region: region
-    //ip: firewall.outputs.ip
   }
 }
 
