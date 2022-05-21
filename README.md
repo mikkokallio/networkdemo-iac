@@ -21,7 +21,7 @@ The main template deploys the following assets to Azure:
 * One or more spoke vnets that are peered bi-directionally with the hub.
 * In each spoke vnet, two subnets and a VM with the network watcher and AMA extensions enabled.
 * Routes to enable spoke-spoke traffic.
-* A Log Analytics workspace and storage account for firewall logs and other data.
+* A Log Analytics workspace for firewall and VM logs and storage account for NSG flow logs and other data.
 * A DNS zone that is linked to the hub and all spokes.
 
 ## Bugs
