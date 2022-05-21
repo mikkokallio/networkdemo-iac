@@ -39,9 +39,19 @@ module spoke 'spoke.bicep' = [for i in range(1, numberOfSpokes): {
     ipSpace: '${i + 1}' // 10.0.x.0
     hubName: hub.outputs.vnetName
     region: region
+    routetableId: routes.outputs.id
+  }
+}]
+
+@description('Deploy a VM in each spoke vnet.')
+module vm 'vm.bicep' = [for i in range(0, numberOfSpokes): {
+  name: 'vm-spoke-0${i + 1}'
+  params: {
+    vmNumber: '0${i + 1}'
+    region: region
     adminPassword: adminPassword
     adminUsername: adminUsername
-    routetableId: routes.outputs.id
+    subnetId: '${spoke[i].outputs.id}/subnets/subnet-web'
     logsId: logs.outputs.id
     storageId: storage.outputs.id
   }
