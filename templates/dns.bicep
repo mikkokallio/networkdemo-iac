@@ -20,12 +20,46 @@ resource dnslink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-
   }
 }]
 
-resource hubdnslink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+resource dnslink_hub 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   name: 'dnslink-hub'
   location: 'global'
   parent: dnszone
   properties: {
     registrationEnabled: true
+    virtualNetwork: {
+      id: hubId
+    }
+  }
+}
+
+resource dnszone_blob 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+  name: 'privatelink.blob.core.windows.net'
+  location: 'global'
+}
+
+resource dnszone_vault 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+  name: 'privatelink.vaultcore.azure.net'
+  location: 'global'
+}
+
+resource dnslink_vault 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = [for i in range(0, length(spokeIds)): {
+  name: 'dnslink-vault-${i}'
+  parent: dnszone_vault
+  location: 'global'
+  properties: {
+    virtualNetwork: {
+      id: spokeIds[i]
+    }
+    registrationEnabled: false
+  }
+}]
+
+resource dnslink_vault_hub 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  name: 'dnslink-vault-hub'
+  location: 'global'
+  parent: dnszone_vault
+  properties: {
+    registrationEnabled: false
     virtualNetwork: {
       id: hubId
     }

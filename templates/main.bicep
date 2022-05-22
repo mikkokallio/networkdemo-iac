@@ -106,3 +106,11 @@ module storage 'storage.bicep' = {
     region: region
   }
 }
+
+@description('Deploy a key vault.')
+module keyvault 'vault.bicep' = {
+  name: 'keyvault'
+  params: {
+    region: region
+  }
+}

@@ -24,6 +24,12 @@ The main template deploys the following assets to Azure:
 * A Log Analytics workspace for firewall and VM logs and storage account for NSG flow logs and other data.
 * A DNS zone that is linked to the hub and all spokes.
 
+## Scenarios
+
+* Network Watcher and flow logs
+* Routing in a hub-spoke architecture
+* Securing a storage account with a private endpoint and accessing it through a private network
+
 ## Bugs
 
 * Firewall deployment isn't idempotent. Attempting to run the deployment again results in an error.
@@ -37,13 +43,17 @@ The main template deploys the following assets to Azure:
 ## Todo
 
 * VPN gateway
-* Key vault for SSH setup
+* Key vault with private endpoint (in progress)
+* Use key vault for SSH
 * VM enable logging to Log Analytics
-* Put e.g. private storage endpoint in dedicated subnet in the hub and add DNS zone
+* Block public access to storage and put e.g. private storage endpoint in dedicated subnet in the hub and add DNS zone
 * Add simple apps in VMs to generate some traffic
 * Use deployment script
 * Firewall workbook
 * Experiment with Azure DNS Private Resolver or Firewall as DNS Proxy
-* Block public access to storage
 * NSGs in subnets by default, move flow logs to those
 * Enable tagging
+* Load balancing
+* Some support for hybrid connectivity and Arc
+* Consider a mock implementation of landing zone architecture with segmentation into rg-management, rg-connectivity, and rg-lz for different types of landing zones / spokes.
+* Spokes could have some variety in the workloads, e.g. App Service or AKS. 
